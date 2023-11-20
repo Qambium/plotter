@@ -1,0 +1,149 @@
+<!-- <nav class="navbar fixed-top bg-dark " data-bs-theme="dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Plotter</a>
+  </div>
+</nav> -->
+
+<div class="wrapper">
+
+  <div id="map">
+
+  </div>
+
+  <div id="sidebar" class = "border-start shadow" style = "width : 30%">
+
+    <div class="card border-0 h-100">
+      <div class="card-header">
+        <ul class="nav nav-pills card-header-pills">
+          <li class="nav-item">
+            <a class="nav-link text-dark" [ngClass] = "{'active bg-success text-white' : navigation == 'peuplement'}" (click)="navigation = 'peuplement'" >Peuplement</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-dark" [ngClass] = "{'active bg-success text-white' : navigation == 'placettes'}" (click)="navigation = 'placettes'" >Placettes</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="card-body" style="overflow-y : scroll" *ngIf = "navigation == 'peuplement'">
+        <div class="d-flex flex-column mb-3">
+          <label class="form-label">Nombre de peuplements :</label>
+          <div class="d-flex">
+            <input type="number" min = "1" step="1" class="form-control form-control-sm" [(ngModel)]="mapService.nbPeuplements" (change)="mapService.updatePeuplements()">
+            <button class="ms-2 btn btn-sm btn-success" (click)="mapService.updatePeuplements()"><i class="bi bi-arrow-repeat"></i></button>
+          </div>
+        </div>
+
+        <!-- <div class="card"> -->
+          <div class="table-responsive card border-bottom-0">
+            <table class="table m-0" style = "font-size : .7rem ">
+              <thead>
+                <tr>
+                  <th>Essence</th>
+                  <th>Surface</th>
+                  <th>Min</th>
+                  <th>Max</th>
+                  <th>Densité</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor=" let peupl of mapService.peuplements" >
+                  <td>
+                    <select class="form-control form-control-sm border-0 p-0 m-0"
+                      [(ngModel)]="peupl.essence" style = "font-size : .7rem !important"
+                      (change)="mapService.updateArbres()" >
+                      <option [ngValue]="ess" *ngFor="let ess of mapService.listeEssence" >{{ess}}</option>
+                    </select>
+                  <td class="text-muted">{{peupl.surface + 'ha'}}</td>
+                  <td><input min = "15" max = "80" step = "5" type = "number"
+                    class="form-control from-control-sm border-0 m-0 p-0"
+                    style = "font-size : .7rem !important"
+                    [(ngModel)]="peupl.diamMin"
+                    (change)="mapService.updateArbres()" ></td>
+                  <td><input min = "15" max = "80" step = "5" type = "number"
+                    class="form-control from-control-sm border-0 m-0 p-0"
+                    style = "font-size : .7rem !important"
+                    [(ngModel)]="peupl.diamMax"
+                    (change)="mapService.updateArbres()" ></td>
+                  <td><input min = "50" max = "800" step = "10" type = "number"
+                    class="form-control from-control-sm border-0 m-0 p-0"
+                    style = "font-size : .7rem !important"
+                    [(ngModel)]="peupl.densite"
+                    (change)="mapService.updateArbres()" ></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        <!-- </div> -->
+
+        <small class = "text-muted">Pour des raison de performances, une seule essence est permise par peuplement. Mais vous pouvez modifier le diam min et max ainsi que la densité du peuplement.</small>
+
+      </div>
+      <!-- .card-body -->
+
+      <div class="card-body" style="overflow-y : scroll" *ngIf = "navigation == 'placettes'">
+        <div class="d-flex flex-column mb-3 ">
+          <label class="form-label">Echantillonnage : </label>
+          <select class="form-select form-select-sm" [(ngModel)]="mapService.echantillonnage" (change)="mapService.updatePlacettes()">
+            <option value = "systematique">Systématique</option>
+            <option value = "aleatoire">Aléatoire</option>
+            <option value = "libre">Libre</option>
+          </select>
+          <small *ngIf = "mapService.echantillonnage == 'libre'" class="text-muted">Veuillez cliquer sur la carte pour ajouter les placettes.</small>
+        </div>
+        <div *ngIf = "mapService.echantillonnage == 'systematique'" class="d-flex flex-column mb-3 ">
+          <label class="form-label">Distance entre placette (m): </label>
+          <input type="number"
+            [(ngModel)]="mapService.distancePlacette"
+            (change) = "mapService.updatePlacettes()"
+            min = "50"
+            class="form-control form-control-sm" >
+          <small><b>{{mapService.placettesHa}} placettes/ha</b></small>
+        </div>
+        <div *ngIf = "mapService.echantillonnage == 'aleatoire'" class="d-flex flex-column mb-3 ">
+          <label class="form-label">Taux sondage : </label>
+          <input type="number" [(ngModel)]="mapService.nbPlacetteAleatoire" (change) = "mapService.updatePlacettes()" class="form-control form-control-sm" >
+          <small><b>{{mapService.placettesHa}} placettes/ha</b></small>
+        </div>
+        <div class="d-flex flex-column mb-3 ">
+          <label class="form-label">Type de placette : </label>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" (change) = "mapService.updateSelectionArbres()" [(ngModel)]="mapService.typePlacette" value = "surfacique" >
+            <label class="form-check-label" >
+              Surfacique
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" (change) = "mapService.updateSelectionArbres()" [(ngModel)]="mapService.typePlacette" value = "relascopique" >
+            <label class="form-check-label" >
+              Relascopique
+            </label>
+          </div>
+        </div>
+        <div *ngIf="mapService.typePlacette == 'surfacique' " class="d-flex flex-column mb-3 ">
+          <label class="form-label">Rayon placette (m) : </label>
+          <input type="number" [(ngModel)]="mapService.rayonPlacette" (change)="mapService.updateSelectionArbres()" step = "0.1" class="form-control">
+        </div>
+        <div *ngIf="mapService.typePlacette == 'relascopique' " class="d-flex flex-column mb-3 ">
+          <label class="form-label">Facteur relascopique : </label>
+          <select class="form-select form-select-sm" [(ngModel)]="mapService.facteurRelascopique" (change)="mapService.updateSelectionArbres()">
+            <option [ngValue] = "1">1</option>
+            <option [ngValue] = "2">2</option>
+          </select>
+        </div>
+
+      </div>
+      <!-- .card-body -->
+
+
+      <div class="card-footer p-2" style = "height : 40%">
+
+        <div style = " position : relative ; height : 100%">
+          <canvas  id = "chartResults" ></canvas>
+        </div>
+      </div>
+    </div>
+    <!-- .card -->
+
+  </div>
+  <!-- #Sidebar -->
+</div>

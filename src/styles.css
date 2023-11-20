@@ -1,0 +1,32 @@
+
+
+.wrapper {
+
+    display: flex;
+    /* height: calc(100vh - 56px); */
+    height: 100vh;
+    /* margin-top: 56px; */
+    width: 100vw;
+}
+
+#map{
+
+  flex: 1 1 auto;
+}
+.leaflet-container {
+    background: #fff;
+    outline: 0;
+}
+.leaflet-tooltip {
+  border : none;
+  background : none;
+  color : red;
+  font-weight: bold;
+  box-shadow: none;
+
+}
+
+.card .table .th {
+  border : red;
+  border-radius: 25px !important;
+}
