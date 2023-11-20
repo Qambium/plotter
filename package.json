@@ -1,10 +1,12 @@
 {
   "name": "plotter",
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "author" : "Marxus95 <marcmul@icloud.com>",
+  "description": "Application web de comparaison d'inventaire forestier",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --deploy-url=https://qambium.fr/plotter/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
