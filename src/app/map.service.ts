@@ -138,7 +138,7 @@ export class MapService {
       if(this.echantillonnage == 'libre'){
         // On ajoute une placette où on a cliqué sur la carte.
         this.placettesLayer.addData(turf.point([e.latlng.lng, e.latlng.lat]));
-        this.updateSelectionArbres();
+        this.updatePlacettes();
       }
     });
 
@@ -251,11 +251,24 @@ export class MapService {
 
   }
 
+  changeEchantillonnage() : void {
+
+    // Au cas où on choisi 'libre' on supprime une première fois les placettes
+    // existantes. Sinon elle sont supprimée et re-créées à chaque changement
+    // de paremètres pour systématique et aléatoire.
+    if(this.echantillonnage == 'libre'){
+      this.placettesLayer.clearLayers();
+    }
+
+    this.updatePlacettes();
+  }
+
   updatePlacettes() : void {
 
-    this.placettesLayer.clearLayers();
 
     if(this.echantillonnage == 'systematique'){
+
+      this.placettesLayer.clearLayers();
 
       var distance = this.distancePlacette;
 
@@ -293,6 +306,8 @@ export class MapService {
 
     } else if (this.echantillonnage == 'aleatoire'){
 
+      this.placettesLayer.clearLayers();
+
       var placettesAlea = turf.randomPoint(
         this.nbPlacetteAleatoire * 1.5,
         {bbox:turf.bbox(this.parcelleLayer.toGeoJSON())  }
@@ -311,8 +326,6 @@ export class MapService {
       });
 
       this.placettesHa = Math.round(placettesAlea.features.length * 10000/ turf.area(this.parcelleLayer.toGeoJSON()) * 100 ) / 100;
-
-
 
     }
 
@@ -339,6 +352,7 @@ export class MapService {
         this.placetteMaterialisationLayer.addData(buffer);
 
         turf.pointsWithinPolygon(this.arbresLayer.toGeoJSON(), buffer).features.forEach((arbre : any)=>{
+          arbre.properties.peuplement = placette.properties.peuplement;
           arbre.properties.placette = placette.properties.nom;
           this.arbresPlacettesLayer.addData(arbre);
           this._arbresInv.push(arbre.properties);
@@ -362,6 +376,7 @@ export class MapService {
             this.placetteMaterialisationLayer.addData(
               turf.lineString([arbre.geometry.coordinates, placette.geometry.coordinates]));
 
+            arbre.properties.peuplement = placette.properties.peuplement;
             arbre.properties.placette = placette.properties.nom;
             this.arbresPlacettesLayer.addData(arbre);
             this._arbresInv.push(arbre.properties);
@@ -370,7 +385,7 @@ export class MapService {
       });
     }
 
-    console.log(this._arbresInv);
+    
     this.arbres.next({inv : this._arbresInv, parcelle : this._arbresParcelle});
 
   }

@@ -83,7 +83,7 @@
       <div class="card-body" style="overflow-y : scroll" *ngIf = "navigation == 'placettes'">
         <div class="d-flex flex-column mb-3 ">
           <label class="form-label">Echantillonnage : </label>
-          <select class="form-select form-select-sm" [(ngModel)]="mapService.echantillonnage" (change)="mapService.updatePlacettes()">
+          <select class="form-select form-select-sm" [(ngModel)]="mapService.echantillonnage" (change)="mapService.changeEchantillonnage()">
             <option value = "systematique">Systématique</option>
             <option value = "aleatoire">Aléatoire</option>
             <option value = "libre">Libre</option>
